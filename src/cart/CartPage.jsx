@@ -1,6 +1,7 @@
 import React from "react";
 import { useCart } from "./CartContext";
 import { subscriptions, accessories } from "../Data";
+import "./CartPage.css";
 
 function money(n) {
   return `$${Number(n).toFixed(2)}`;
