@@ -1,5 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "./CartContext";
+import { useAuth } from "../auth/AuthContext";
 import { subscriptions, accessories } from "../Data";
 import "./CartPage.css";
 
@@ -8,29 +10,55 @@ function money(n) {
 }
 
 export default function CartPage() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const {
     items,
     totalPrice,
     warning,
-    addItem, // temporary until product pages exist
+    addItem, 
     increment,
     decrement,
     removeItem,
     clearCart,
   } = useCart();
 
-  // Temporary “test add” bar using the real Data.js arrays
   const sampleProducts = [...subscriptions, ...accessories];
+
+  function handleCheckout() {
+    if (items.length === 0) return;
+    navigate("/checkout");
+  }
+
+  function handleLogout() {
+    logout();
+  }
 
   return (
     <div className="cart-page">
-      <h1 className="cart-title">Shopping Cart</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1 className="cart-title">Shopping Cart</h1>
+        <button className="btn btn-secondary" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
 
       {/* Temporary buttons for testing cart logic (remove later) */}
       <div className="cart-testbar">
         <span className="cart-testbar-label">Test Add:</span>
         {sampleProducts.map((p) => (
-          <button key={p.id} className="btn btn-secondary" onClick={() => addItem(p)}>
+          <button
+            key={p.id}
+            className="btn btn-secondary"
+            onClick={() => addItem(p)}
+          >
             {p.name}
           </button>
         ))}
@@ -53,23 +81,36 @@ export default function CartPage() {
                 <div className="cart-item-info">
                   <div className="cart-item-name">{it.name}</div>
                   <div className="cart-item-meta">
-                    <span className="cart-item-price">{money(it.price)} each</span>
-                    <span className="cart-item-type">Type: {it.category}</span>
+                    <span className="cart-item-price">
+                      {money(it.price)} each
+                    </span>
+                    <span className="cart-item-type">
+                      Type: {it.category}
+                    </span>
                   </div>
                 </div>
 
                 <div className="cart-item-actions">
                   <div className="qty-controls">
-                    <button className="btn btn-qty" onClick={() => decrement(it.id)}>
+                    <button
+                      className="btn btn-qty"
+                      onClick={() => decrement(it.id)}
+                    >
                       -
                     </button>
                     <span className="qty-value">{it.quantity}</span>
-                    <button className="btn btn-qty" onClick={() => increment(it.id)}>
+                    <button
+                      className="btn btn-qty"
+                      onClick={() => increment(it.id)}
+                    >
                       +
                     </button>
                   </div>
 
-                  <button className="btn btn-remove" onClick={() => removeItem(it.id)}>
+                  <button
+                    className="btn btn-remove"
+                    onClick={() => removeItem(it.id)}
+                  >
                     Remove
                   </button>
                 </div>
@@ -78,7 +119,11 @@ export default function CartPage() {
           )}
 
           <div className="cart-footer">
-            <button className="btn btn-secondary" onClick={clearCart} disabled={items.length === 0}>
+            <button
+              className="btn btn-secondary"
+              onClick={clearCart}
+              disabled={items.length === 0}
+            >
               Clear Cart
             </button>
             <button className="btn btn-secondary" disabled>
@@ -103,13 +148,21 @@ export default function CartPage() {
               <span>{money(totalPrice)}</span>
             </div>
 
-            <button className="btn btn-primary" disabled={items.length === 0}>
+            <button
+              className="btn btn-primary"
+              disabled={items.length === 0}
+              onClick={handleCheckout}
+            >
               Checkout
             </button>
           </div>
 
           <div className="coupon-box">
-            <input className="coupon-input" type="text" placeholder="Coupon code (optional)" />
+            <input
+              className="coupon-input"
+              type="text"
+              placeholder="Coupon code (optional)"
+            />
             <button className="btn btn-secondary" disabled>
               Apply
             </button>
